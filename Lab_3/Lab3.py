@@ -3,6 +3,7 @@ from math import sqrt
 from scipy import linalg
 from scipy.stats import t, f
 
+from time import perf_counter
 
 x_list = [[20, 70], [-20, 40], [70, 80]]
 
@@ -118,12 +119,18 @@ Sbs = sqrt(S2bs)
 bb = [sum(average_y[k] * tr_sx[i][k] for k in range(N)) / N for i in range(N)]
 t_list = [abs(bb[i]) / Sbs for i in range(N)]
 b_list = [b0, b1, b2, b3]
+
+time_list = []
+
 for i in range(N):
+    start_time = perf_counter()
     if t_list[i] < t.ppf(q=0.975, df=f3):
         print('Незначний: ', b_list[i])
         b_list[i] = 0
         d -= 1
-    else: print('Значний:   ', b_list[i])
+    else:
+        print('Значний:   ', b_list[i])
+    time_list.append((perf_counter() - start_time))
 
 y_reg = [b_list[0] + b_list[1] * mat_X[i][0] + b_list[2] * mat_X[i][1] + b_list[3] * mat_X[i][2]
          for i in range(N)]
@@ -144,3 +151,12 @@ if Fp > F_table:
     print('Модель неадекватна при 0.05')
 else:
     print('Модель адекватна при 0.05')
+
+print("-"*65)
+print("\nДодаткове завдання")
+
+total_time = 0
+for i in range(len(time_list)):
+    print(f"Час {i+1}-ої перевірки на значимість - {time_list[i]}")
+    total_time += time_list[i]
+print(f"Загальний час пошуку - {total_time}")
