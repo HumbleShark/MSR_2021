@@ -149,16 +149,21 @@ if Gp < Gt:
         beta_list[7] += (average_y[i] * x1x2x3_f[i]) / N
     t_list = [abs(beta_list[i]) / S_beta for i in range(0, N)]
 
+    significant = 0
     for i, j in enumerate(t_list):
         if j >= t_criterium.ppf(q=0.975, df=F3):
             print(f'Значний: {beta_list[i]}')
+            significant += 1
         else:
             print(f'Незначний: {beta_list[i]}')
             beta_list[i] = 0
             d -= 1
+    print("\nКількість значних коефіцієнтів - {}\nКількість незначних коефіцієнтів - {}".format(significant, 8-significant))
     print("-" * 100)
     print("y = {} + {}*x1 + {}*x2 + {}*x3 + {}*x1x2 + {}*x1x3 + {}*x2x3 + {}*x1x2x3".format(*beta_list))
-
+    if significant >= 5:
+        print("Кількість значимих коефіцієнтів більша за кількість незначимих, отже система не адекватна")
+        exit()
     y_counted = [sum([beta_list[0], *[beta_list[i] * x_list[1:][j][i] for i in range(N)]])
                  for j in range(N)]
     dispersion_ad = 0
