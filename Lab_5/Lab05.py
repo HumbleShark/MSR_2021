@@ -54,6 +54,7 @@ def s_kv(y_aver):
 
 
 def experiment(n, m):
+    global counter
     # Створення матриці
 
     for i in range(n):
@@ -107,13 +108,13 @@ def experiment(n, m):
     x = add_sq(x)
 
     show_arr = pd.DataFrame(x)
-    print('\nМатриця X:\n', tabulate(show_arr, headers='keys', tablefmt='psql'))
+    # print('\nМатриця X:\n', tabulate(show_arr, headers='keys', tablefmt='psql'))
 
     show_arr = pd.DataFrame(x_norm)
-    print('\nНормована матриця X:\n', tabulate(show_arr.round(0), headers='keys', tablefmt='psql'))
+    # print('\nНормована матриця X:\n', tabulate(show_arr.round(0), headers='keys', tablefmt='psql'))
 
     show_arr = pd.DataFrame(y)
-    print('\nМатриця Y:\n', tabulate(show_arr, headers='keys', tablefmt='psql'))
+    # print('\nМатриця Y:\n', tabulate(show_arr, headers='keys', tablefmt='psql'))
 
     y_average = [round(sum(i) / len(i), 3) for i in y]
 
@@ -123,16 +124,16 @@ def experiment(n, m):
     skm.fit(x, y_average)
     b = skm.coef_
 
-    print('\nКоефіцієнти рівняння регресії:')
+    # print('\nКоефіцієнти рівняння регресії:')
     b = [round(i, 3) for i in b]
-    print("y = {} +{}*x1 +{}*x2 +{}*x3 + {}*x1*x2 + {}*x1*x3 + {}*x2*x3 + b{}*x1*x2*x3 + {}x1^2 + {}x2^2 + {}x3^2\n".format(*b))
-    print('\nРезультат рівняння зі знайденими коефіцієнтами:')
-    print(np.dot(x, b))
-    print("-" * 100)
+    # print("y = {} +{}*x1 +{}*x2 +{}*x3 + {}*x1*x2 + {}*x1*x3 + {}*x2*x3 + b{}*x1*x2*x3 + {}x1^2 + {}x2^2 + {}x3^2\n".format(*b))
+    # print('\nРезультат рівняння зі знайденими коефіцієнтами:')
+    # print(np.dot(x, b))
+    # print("-" * 100)
 
     # Проведемо перевірку
 
-    print('\nПеревірка рівняння:')
+    # print('\nПеревірка рівняння:')
     f1 = m - 1
     f2 = n
     f3 = f1 * f2
@@ -146,43 +147,45 @@ def experiment(n, m):
     G_kr = fisher_value / (fisher_value + f1 - 1)
 
     y_average = [round(sum(i) / len(i), 3) for i in y]
-    print('\nСереднє значення y:', y_average)
+    # print('\nСереднє значення y:', y_average)
 
     disp = []
     for i in range(n):
         s = sum([(y_average[i] - y[i][j]) ** 2 for j in range(m)]) / m
         disp.append(round(s, 3))
-    print('Дисперсія y:', disp)
+    # print('Дисперсія y:', disp)
 
     Gp = max(disp) / sum(disp)
-    print('\nПеревіримо за критерієм Кохрена:')
+    # print('\nПеревіримо за критерієм Кохрена:')
 
-    print(f'Gp = {Gp}')
+    # print(f'Gp = {Gp}')
     if Gp < G_kr:
-        print(f'З ймовірністю {1 - q}')
+        # print(f'З ймовірністю {1 - q}')
+        pass
     else:
-        print("Збільшимо кількість дослідів")
+        # print("Збільшимо кількість дослідів")
         m += 1
         experiment(n, m)
 
     ts = criteria_studenta(x_norm[:, 1:], y_average)
-    print('\nКритерій Стьюдента:')
-    print(ts)
+    # print('\nКритерій Стьюдента:')
+    # print(ts)
     res = [t for t in ts if t > t_student]
     final_k = [b[i] for i in range(len(ts)) if ts[i] in res]
-    print('\nКоефіцієнти, які не мають статистичного значення:')
-    print([round(i, 3) for i in b if i not in final_k])
+    # print('\nКоефіцієнти, які не мають статистичного значення:')
+    # print([round(i, 3) for i in b if i not in final_k])
 
     y_new = []
     for j in range(n):
         y_new.append(round(regression([x[j][i] for i in range(len(ts)) if ts[i] in res], final_k), 3))
 
-    print(f'\nЗначення y з коефіцієнтами: {final_k}')
-    print(y_new)
+    # print(f'\nЗначення y з коефіцієнтами: {final_k}')
+    # print(y_new)
 
     d = len(res)
     if d >= n:
-        print('\nF4 <= 0')
+        # print('\nF4 <= 0')
+        pass
 
     f4 = n - d
 
@@ -191,14 +194,16 @@ def experiment(n, m):
     f_p = s_ad / s_kv_aver
     fisher = partial(f.ppf, q=0.95)
     f_t = fisher(dfn=f4, dfd=f3)
-    print("-" * 100)
-    print('\nПеревірка адекватності за критерієм Фішера')
-    print('Fp =', f_p)
-    print('F_t =', f_t)
+    # print("-" * 100)
+    # print('\nПеревірка адекватності за критерієм Фішера')
+    # print('Fp =', f_p)
+    # print('F_t =', f_t)
     if f_p < f_t:
-        print('Математична модель адекватна')
+        # print('Математична модель адекватна')
+        counter += 1
     else:
-        print('Математична модель неадекватна!')
+        # print('Математична модель неадекватна!')
+        pass
 
 
 n = 15
@@ -221,4 +226,10 @@ y_min = 200 + int(x_average_min)
 
 y = np.zeros(shape=(n, m))
 
-experiment(n, m)
+experiments = 100
+counter = 0
+
+for i in range(experiments):
+    experiment(n, m)
+
+print("Кількість експериментів: {}\nКількість однорідних дисперсій: {}".format(experiments, counter))
